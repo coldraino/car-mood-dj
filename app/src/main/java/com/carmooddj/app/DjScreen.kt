@@ -106,13 +106,13 @@ fun DjApp(state: DjState, synth: SynthPlayer) {
                         NowPlaying(state, mood, accent)
                     }
                     Column(modifier = Modifier.width(380.dp)) {
-                        SignalPanel(signals, mood, accent)
+                        SignalPanel(signals, mood, accent, state.demoMode)
                     }
                 }
             } else {
                 Situation(mood, accent)
                 NowPlaying(state, mood, accent)
-                SignalPanel(signals, mood, accent)
+                SignalPanel(signals, mood, accent, state.demoMode)
             }
             Timeline(signals, totalMin, mood, accent)
             if (state.demoMode) {
@@ -222,13 +222,14 @@ private fun NowPlaying(state: DjState, mood: Mood, accent: Color) {
 }
 
 @Composable
-private fun SignalPanel(signals: Signals, mood: Mood, accent: Color) {
+private fun SignalPanel(signals: Signals, mood: Mood, accent: Color, demo: Boolean) {
     val wiperActive = mood == Mood.RAIN || mood == Mood.SNOW
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text(text = "차량이 감지한 신호", color = TextSub, fontSize = 18.sp)
         SignalRow("와이퍼", onOff(signals.wiperOn), wiperActive, accent)
         SignalRow(
-            "실내 온도",
+            // 시연 모드의 온도는 바깥 기온을 흉내 낸 값, 실제 모드는 차량 실내 온도입니다.
+            if (demo) "바깥 기온 (시연)" else "실내 온도",
             signals.tempC?.let { "${Math.round(it)}°C" } ?: "값 없음",
             mood == Mood.SNOW,
             accent
@@ -370,10 +371,10 @@ private fun DemoPanel(state: DjState, accent: Color) {
             Pill("와이퍼 ${onOff(demo.wiperOn)}", demo.wiperOn == true, accent) {
                 state.demo = state.demo.copy(wiperOn = state.demo.wiperOn != true)
             }
-            Pill("온도 14°C", demo.tempC == 14f, accent) {
+            Pill("바깥 기온 14°C", demo.tempC == 14f, accent) {
                 state.demo = state.demo.copy(tempC = 14f)
             }
-            Pill("온도 -2°C", demo.tempC == -2f, accent) {
+            Pill("바깥 기온 -2°C", demo.tempC == -2f, accent) {
                 state.demo = state.demo.copy(tempC = -2f)
             }
             Pill("전조등 ${onOff(demo.headlightOn)}", demo.headlightOn == true, accent) {
