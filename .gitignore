@@ -1,0 +1,12 @@
+.gradle/
+.idea/
+.kotlin/
+build/
+local.properties
+*.iml
+.DS_Store
+build.log
+logcat.txt
+logcat.txt
+apk/CarMoodDJ_release.apk
+SUBMIT.txt
