@@ -227,13 +227,16 @@ private fun SignalPanel(signals: Signals, mood: Mood, accent: Color, demo: Boole
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text(text = "차량이 감지한 신호", color = TextSub, fontSize = 18.sp)
         SignalRow("와이퍼", onOff(signals.wiperOn), wiperActive, accent)
-        SignalRow(
-            // 시연 모드의 온도는 바깥 기온을 흉내 낸 값, 실제 모드는 차량 실내 온도입니다.
-            if (demo) "바깥 기온 (시연)" else "실내 온도",
-            signals.tempC?.let { "${Math.round(it)}°C" } ?: "값 없음",
-            mood == Mood.SNOW,
-            accent
-        )
+        // 온도는 선곡 판단에 쓰일 때(시연 모드의 눈 판정)만 보여 줍니다.
+        // 실제 모드는 비·야간·도착만 판정하므로 온도를 표시하지 않습니다.
+        if (demo) {
+            SignalRow(
+                "바깥 기온 (시연)",
+                signals.tempC?.let { "${Math.round(it)}°C" } ?: "값 없음",
+                mood == Mood.SNOW,
+                accent
+            )
+        }
         SignalRow("전조등", onOff(signals.headlightOn), mood == Mood.NIGHT, accent)
         SignalRow(
             "도착까지",
@@ -417,7 +420,7 @@ private fun DemoPanel(state: DjState, accent: Color) {
 private fun StatusLines(state: DjState) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Text(text = state.vehicleStatus, color = TextSub, fontSize = 14.sp)
-        for ((key, label) in listOf("wiper" to "와이퍼", "light" to "전조등", "temp" to "온도")) {
+        for ((key, label) in listOf("wiper" to "와이퍼", "light" to "전조등", "temp" to "실내 온도(참고, 판단에 미사용)")) {
             Text(
                 text = "$label: ${state.diag[key] ?: "응답 없음"}",
                 color = TextSub,
